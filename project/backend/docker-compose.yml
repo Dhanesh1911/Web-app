@@ -1,0 +1,71 @@
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: doctor_frontend
+    ports:
+      - "3000:8080"
+    depends_on:
+      - backend
+    networks:
+      - my_new_network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    container_name: doctor_backend
+    ports:
+      - "5000:8080"
+    environment:
+      PORT: 8080
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: doctor_user
+      DB_PASSWORD: change_this_password
+      DB_NAME: doctor_db
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - my_new_network
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    container_name: doctor_database
+    environment:
+      MYSQL_ROOT_PASSWORD: change_this_root_password
+      MYSQL_DATABASE: doctor_db
+      MYSQL_USER: doctor_user
+      MYSQL_PASSWORD: change_this_password
+    volumes:
+      - my_new_volume:/var/lib/mysql
+    networks:
+      - my_new_network
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - -h
+        - localhost
+        - -u
+        - root
+        - -pchange_this_root_password
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  my_new_volume:
+    name: my_new_volume
+
+networks:
+  my_new_network:
+    name: my_new_network
+    driver: bridge
+
