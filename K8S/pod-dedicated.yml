@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-dedicated
+spec:
+  nodeSelector:
+    dedicated: gpu
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: gpu
+      effect: NoSchedule
+  containers:
+    - name: nginx
+      image: nginx

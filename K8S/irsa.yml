@@ -1,0 +1,21 @@
+# 1. ServiceAccount: annotation-ல IAM role-ஓட ARN
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: s3-sa
+  namespace: default
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::161987605604:role/k8s
+---
+# 2. Pod: serviceAccountName-ல அந்த ServiceAccount
+apiVersion: v1
+kind: Pod
+metadata:
+  name: s3-test
+  namespace: default
+spec:
+  serviceAccountName: s3-sa
+  containers:
+  - name: aws-cli
+    image: amazon/aws-cli
+    command: ["sleep", "3600"]
